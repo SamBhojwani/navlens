@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+
+# Env / secrets
+.env
+
+# Data dumps
+data/*.txt
+data/*.json
+!data/.gitkeep
+
+# OS
+.DS_Store
+
+# Postgres volume (docker)
+pgdata/

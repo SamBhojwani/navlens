@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres:15
+    container_name: navlens_db
+    environment:
+      POSTGRES_USER: navlens
+      POSTGRES_PASSWORD: navlens
+      POSTGRES_DB: navlens
+    ports:
+      # Host 5433 -> container 5432, so it never clashes with a local Postgres on 5432.
+      - "5433:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U navlens -d navlens"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
