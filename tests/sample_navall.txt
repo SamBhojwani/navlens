@@ -1,0 +1,21 @@
+Scheme Code;ISIN Div Payout/ ISIN Growth;ISIN Div Reinvestment;Scheme Name;Net Asset Value;Date
+
+Open Ended Schemes(Equity Scheme - Large Cap Fund)
+
+Alpha Mutual Fund
+
+900001;INF001AA0001;INF001AA0002;Alpha Large Cap Fund - Direct Plan - Growth;150.5000;03-Jul-2026
+900002;-;INF001AA0003;Alpha Large Cap Fund - Regular Plan - IDCW;95.1234;03-Jul-2026
+
+Open Ended Schemes(Debt Scheme - Liquid Fund)
+
+Beta Mutual Fund
+
+900003;INF002BB0001;-;Beta Liquid Fund - Direct Plan - Growth;1002.3456;03-Jul-2026
+900004;-;-;Beta Liquid Fund - Bonus;N.A.;03-Jul-2026
+
+Open Ended Schemes(Hybrid Scheme - Balanced Advantage)
+
+Gamma Mutual Fund
+
+900005;INF003CC0001;-;Gamma Balanced Advantage Fund - Direct - Growth;45.6700;03-Jul-2026
