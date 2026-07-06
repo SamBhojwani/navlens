@@ -216,8 +216,11 @@ def ingest(source: str | None = None) -> dict[str, int]:
 
 
 if __name__ == "__main__":
+    from .analytics import safe_refresh
+
     arg = sys.argv[1] if len(sys.argv) > 1 else None
     result = ingest(arg)
+    safe_refresh()
     print(
         f"Parsed {result['records_parsed']} rows | "
         f"AMCs {result['amcs']} | schemes {result['schemes']} | "

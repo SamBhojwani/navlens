@@ -110,8 +110,11 @@ def backfill(scheme_codes: list[int] | None = None, years: int = BACKFILL_YEARS)
 
 
 if __name__ == "__main__":
+    from .analytics import safe_refresh
+
     explicit = [int(a) for a in sys.argv[1:]] or None
     result = backfill(explicit)
+    safe_refresh()
     print(
         f"Backfilled {result['schemes_backfilled']} schemes | "
         f"{result['nav_points']} NAV points | new facts {result['facts_inserted']}"
