@@ -95,6 +95,22 @@ def amc_rollup() -> list[dict]:
     )
 
 
+def schemes_with_history(min_points: int = 30) -> list[dict]:
+    """Schemes that have enough NAV history for the charts to be meaningful."""
+    return db.query(
+        """
+        SELECT s.scheme_id, s.scheme_code, s.scheme_name, s.scheme_category, a.amc_name
+        FROM dim_scheme s
+        JOIN dim_amc a ON a.amc_id = s.amc_id
+        JOIN (
+            SELECT scheme_id FROM fact_nav GROUP BY scheme_id HAVING COUNT(*) >= %s
+        ) h ON h.scheme_id = s.scheme_id
+        ORDER BY s.scheme_category, s.scheme_name
+        """,
+        (min_points,),
+    )
+
+
 def categories() -> list[str]:
     rows = db.query(
         "SELECT DISTINCT scheme_category FROM dim_scheme WHERE scheme_category <> 'Other' ORDER BY 1"
