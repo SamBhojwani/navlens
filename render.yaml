@@ -1,0 +1,23 @@
+# Render blueprint: deploy the API and the dashboard as two free web services.
+# Point both at a managed Postgres (Neon/Supabase) by setting DATABASE_URL in the
+# Render dashboard. Run the schema + an initial ingest/backfill against that DB once.
+services:
+  - type: web
+    name: navlens-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn navlens.api:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+
+  - type: web
+    name: navlens-dashboard
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run dashboard/app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
+    envVars:
+      - key: DATABASE_URL
+        sync: false
