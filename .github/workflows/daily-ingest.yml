@@ -1,0 +1,28 @@
+name: Daily NAV ingest
+
+# Runs after AMFI publishes end-of-day NAVs, on business days only.
+# 20:00 UTC = 01:30 IST (next day), comfortably after publication.
+on:
+  schedule:
+    - cron: "0 20 * * 1-5"
+  workflow_dispatch: {}   # allow manual runs from the Actions tab
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Ingest today's AMFI NAV file
+        env:
+          # Set this repository secret to your Neon/Supabase connection string.
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python -m navlens.ingest
