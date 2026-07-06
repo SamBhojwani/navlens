@@ -20,8 +20,8 @@ backfill:         ## backfill ~2y history for the analytics subset
 refresh:          ## refresh the materialized returns view
 	$(PY) -m navlens.analytics
 
-api:              ## run the FastAPI service
-	./.venv/bin/uvicorn navlens.api:app --reload
+api:              ## run the FastAPI service (port 8010; 8000 is often taken)
+	./.venv/bin/uvicorn navlens.api:app --reload --port 8010
 
 dashboard:        ## run the Streamlit dashboard
 	./.venv/bin/streamlit run dashboard/app.py
