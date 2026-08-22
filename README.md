@@ -1,4 +1,6 @@
-# NAVLens
+<p align="center">
+  <img src="docs/banner.png" alt="NAVLens — SQL-first fund analytics" width="100%">
+</p>
 
 **A SQL-first analytics pipeline for Indian mutual fund NAVs.** It ingests daily NAV data
 from AMFI into a Postgres star schema, computes fund analytics **entirely in SQL** (rolling
@@ -6,9 +8,11 @@ returns, annualized volatility, category rankings, maximum drawdown), exposes th
 FastAPI service, and surfaces them on a Streamlit dashboard. Ingestion is scheduled daily via
 GitHub Actions.
 
-![Python](https://img.shields.io/badge/python-3.13-blue)
-![Postgres](https://img.shields.io/badge/postgres-15-336791)
-![Tests](https://img.shields.io/badge/tests-35_passing-brightgreen)
+<p align="center">
+  <img src="https://img.shields.io/badge/python-3.13-blue" alt="Python">
+  <img src="https://img.shields.io/badge/postgres-15-336791" alt="Postgres">
+  <img src="https://img.shields.io/badge/tests-35_passing-brightgreen" alt="Tests">
+</p>
 
 > Live demo: _deploy pending_ (Postgres on Neon, API + dashboard on Render).
 
