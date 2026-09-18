@@ -1,0 +1,38 @@
+name: Bootstrap database
+
+# One-time setup for a fresh hosted Postgres: schema + views, today's NAV file,
+# then ~2y of history for the analytics subset. Safe to re-run (every load is idempotent).
+on:
+  workflow_dispatch: {}
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check the database secret is set
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::DATABASE_URL repository secret is not set."
+            exit 1
+          fi
+
+      - name: Apply schema and views
+        run: make schema PY=python
+
+      - name: Load today's AMFI NAV file
+        run: make ingest PY=python
+
+      - name: Backfill history for the analytics subset
+        run: make backfill PY=python

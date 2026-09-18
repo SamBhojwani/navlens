@@ -66,3 +66,28 @@ def test_section_header_not_treated_as_amc():
 
 def test_empty_input():
     assert parse_navall("") == []
+
+
+# --- Sep 2026 layout: AMFI added "Plan" and "Option" columns before the NAV ---------
+
+V2 = parse_navall((Path(__file__).parent / "sample_navall_v2.txt").read_text())
+
+
+def test_v2_rows_parsed_not_silently_dropped():
+    assert len(V2) == 2  # the N.A. row is still skipped
+
+
+def test_v2_nav_and_date_read_by_header_name():
+    rec = V2[0]
+    assert rec.nav_value > 0
+    assert rec.nav_date == date(2026, 9, 17)
+
+
+def test_v2_name_keeps_plan_and_option():
+    # Backfill selects on '%direct%' and '%growth%', so the plan/option must stay in the name.
+    assert "Direct Plan" in V2[0].scheme_name and "Growth" in V2[0].scheme_name
+
+
+def test_v2_amc_and_category():
+    assert V2[0].amc_name == "Axis Mutual Fund"
+    assert V2[0].scheme_category == "Equity"

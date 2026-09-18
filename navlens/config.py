@@ -8,9 +8,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_URL = os.environ.get(
-    "DATABASE_URL",
-    "postgresql://navlens:navlens@localhost:5433/navlens",
+# `or`, not a get() default: CI sets DATABASE_URL to "" when the secret is missing,
+# and psycopg2 reads an empty DSN as "use the local Unix socket".
+DATABASE_URL = (
+    os.environ.get("DATABASE_URL")
+    or "postgresql://navlens:navlens@localhost:5433/navlens"
 )
 
 # AMFI daily flat file (live ingestion). Source of truth for the latest NAV.

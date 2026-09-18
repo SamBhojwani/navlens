@@ -11,15 +11,29 @@ jobs:
   ingest:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
           cache: pip
 
       - name: Install dependencies
         run: pip install -r requirements.txt
+
+      - name: Check the database secret is set
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::DATABASE_URL repository secret is not set. Create the hosted Postgres (Neon) and add its connection string under Settings > Secrets > Actions."
+            exit 1
+          fi
+
+      - name: Apply schema and views (idempotent, so a fresh database works)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: make schema PY=python
 
       - name: Ingest today's AMFI NAV file
         env:
