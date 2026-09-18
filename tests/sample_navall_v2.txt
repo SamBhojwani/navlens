@@ -1,0 +1,9 @@
+Scheme Code;ISIN Div Payout/ ISIN Growth;ISIN Div Reinvestment;Scheme Name;Plan;Option;Net Asset Value;Date
+
+Open Ended Schemes(Equity Scheme - Large Cap Fund)
+
+Axis Mutual Fund
+
+120465;INF846K01DP8;-;Axis Large Cap Fund;Direct Plan;Growth Option;68.01;17-Sep-2026
+112278;INF846K01172;INF846K01180;Axis Large Cap Fund;Regular Plan;IDCW Option;17.14;17-Sep-2026
+999999;-;-;Placeholder Fund;Direct Plan;Growth Option;N.A.;17-Sep-2026

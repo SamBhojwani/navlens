@@ -52,30 +52,75 @@ def _parse_date(value: str) -> date | None:
         return None
 
 
+# The original 6-column layout, used if a file ever arrives without a header line.
+_LEGACY_HEADER = (
+    "Scheme Code;ISIN Div Payout/ ISIN Growth;ISIN Div Reinvestment;"
+    "Scheme Name;Net Asset Value;Date"
+)
+
+
+def _column_index(header: str) -> dict[str, int]:
+    """Map the fields we need to their positions in an AMFI header line."""
+    names = [h.strip().lower() for h in header.split(";")]
+    wanted = {
+        "code": "scheme code",
+        "isin1": "isin div payout",
+        "isin2": "isin div reinvestment",
+        "name": "scheme name",
+        "plan": "plan",
+        "option": "option",
+        "nav": "net asset value",
+        "date": "date",
+    }
+    index: dict[str, int] = {}
+    for key, label in wanted.items():
+        for i, n in enumerate(names):
+            if n == label or n.startswith(label + "/") or (key == "isin1" and n.startswith(label)):
+                index[key] = i
+                break
+    missing = {"code", "isin1", "isin2", "name", "nav", "date"} - index.keys()
+    if missing:
+        raise ValueError(f"AMFI header is missing columns {sorted(missing)}: {header!r}")
+    return index
+
+
 def parse_navall(text: str) -> list[NavRecord]:
     """Parse AMFI NAVAll text into NavRecords.
 
     The file interleaves three line kinds between data blocks:
       * a section header   -> "... Schemes(<category text>)"  (sets current category)
       * a fund-house header -> "Axis Mutual Fund"             (sets current AMC)
-      * a data row          -> six semicolon-separated fields
+      * a data row          -> semicolon-separated fields, laid out by the column header
+
+    Columns are located by header name, not position: in Sep 2026 AMFI inserted "Plan" and
+    "Option" columns before the NAV, and a positional parser silently dropped every row.
     """
     records: list[NavRecord] = []
     current_amc: str | None = None
     current_section: str = ""
+    cols = _column_index(_LEGACY_HEADER)
 
     for raw in text.splitlines():
         line = raw.strip()
         if not line:
             continue
-        if line.startswith("Scheme Code"):  # column header
+        if line.startswith("Scheme Code"):  # column header: learn the layout from it
+            cols = _column_index(line)
             continue
 
         if ";" in line:
             parts = [p.strip() for p in line.split(";")]
-            if len(parts) < 6:
+            if len(parts) < len(cols):
                 continue
-            code_s, isin1, isin2, name, nav_s, date_s = parts[:6]
+            code_s = parts[cols["code"]]
+            isin1, isin2 = parts[cols["isin1"]], parts[cols["isin2"]]
+            nav_s, date_s = parts[cols["nav"]], parts[cols["date"]]
+            # Keep the pre-split "Name - Plan - Option" shape so names stay consistent
+            # with rows loaded before the format change (the backfill filters on them).
+            name = " - ".join(
+                parts[cols[k]] for k in ("name", "plan", "option")
+                if k in cols and parts[cols[k]] not in ("", "-")
+            )
             try:
                 scheme_code = int(code_s)
             except ValueError:
@@ -210,6 +255,10 @@ def ingest(source: str | None = None) -> dict[str, int]:
     else:
         text = fetch_navall_text()
     records = parse_navall(text)
+    if not records:
+        # A non-empty file that yields nothing means the format moved under us.
+        # Fail loudly: a green run that loads zero rows hides the break for weeks.
+        raise RuntimeError(f"Parsed 0 NAV records from {len(text):,} bytes; check the AMFI format")
     counts = load_records(records)
     counts["records_parsed"] = len(records)
     return counts
